@@ -43,6 +43,12 @@ app.post('/api/enquiry', async (req, res) => {
       return res.status(400).json({ error: 'Name, email, and phone are required.' });
     }
 
+    // 2. Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Please provide a valid email address.' });
+    }
+
     // 2. Accept data and save to MongoDB
     const newEnquiry = await Enquiry.create({ name, email, phone });
 

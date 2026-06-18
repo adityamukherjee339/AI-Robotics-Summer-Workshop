@@ -9,11 +9,47 @@ export default function RegistrationForm() {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; phone?: string }>({});
+
+  /** Validate individual fields with regex patterns */
+  const validateForm = (): boolean => {
+    const errors: { name?: string; email?: string; phone?: string } = {};
+
+    // Name: at least 2 characters, letters and spaces only
+    if (!formData.name.trim()) {
+      errors.name = "Name is required.";
+    } else if (formData.name.trim().length < 2) {
+      errors.name = "Name must be at least 2 characters.";
+    }
+
+    // Email: standard email regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      errors.email = "Email is required.";
+    } else if (!emailRegex.test(formData.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+
+    // Phone: Indian phone format (10 digits, optionally prefixed with +91)
+    const phoneRegex = /^(\+91[\s-]?)?[6-9]\d{9}$/;
+    if (!formData.phone.trim()) {
+      errors.phone = "Phone number is required.";
+    } else if (!phoneRegex.test(formData.phone.replace(/\s/g, ""))) {
+      errors.phone = "Please enter a valid 10-digit Indian phone number.";
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("loading");
     setErrorMessage("");
+
+    // Run client-side validation first
+    if (!validateForm()) return;
+
+    setStatus("loading");
 
     try {
       const res = await fetch("/api/enquiry", {
@@ -30,6 +66,7 @@ export default function RegistrationForm() {
 
       setStatus("success");
       setFormData({ name: "", email: "", phone: "" });
+      setFieldErrors({});
 
       // Reset success message after 5 seconds
       setTimeout(() => setStatus("idle"), 5000);
@@ -107,10 +144,11 @@ export default function RegistrationForm() {
                   id="name"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-plum focus:border-plum outline-none transition-all bg-white/60 focus:bg-white shadow-sm text-gray-900 placeholder-gray-500"
+                  onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setFieldErrors((prev) => ({ ...prev, name: undefined })); }}
+                  className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-plum focus:border-plum outline-none transition-all bg-white/60 focus:bg-white shadow-sm text-gray-900 placeholder-gray-500 ${fieldErrors.name ? 'border-red-400' : 'border-white/50'}`}
                   placeholder="Your name"
                 />
+                {fieldErrors.name && <p className="text-red-500 text-xs mt-1">{fieldErrors.name}</p>}
               </div>
 
               <div>
@@ -120,10 +158,11 @@ export default function RegistrationForm() {
                   id="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-plum focus:border-plum outline-none transition-all bg-white/60 focus:bg-white shadow-sm text-gray-900 placeholder-gray-500"
+                  onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setFieldErrors((prev) => ({ ...prev, email: undefined })); }}
+                  className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-plum focus:border-plum outline-none transition-all bg-white/60 focus:bg-white shadow-sm text-gray-900 placeholder-gray-500 ${fieldErrors.email ? 'border-red-400' : 'border-white/50'}`}
                   placeholder="Your email"
                 />
+                {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
               </div>
 
               <div>
@@ -133,10 +172,11 @@ export default function RegistrationForm() {
                   id="phone"
                   required
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-white/50 focus:ring-2 focus:ring-plum focus:border-plum outline-none transition-all bg-white/60 focus:bg-white shadow-sm text-gray-900 placeholder-gray-500"
+                  onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setFieldErrors((prev) => ({ ...prev, phone: undefined })); }}
+                  className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-plum focus:border-plum outline-none transition-all bg-white/60 focus:bg-white shadow-sm text-gray-900 placeholder-gray-500 ${fieldErrors.phone ? 'border-red-400' : 'border-white/50'}`}
                   placeholder="+91 98765 XXXXX"
                 />
+                {fieldErrors.phone && <p className="text-red-500 text-xs mt-1">{fieldErrors.phone}</p>}
               </div>
 
               {status === "error" && (

@@ -6,10 +6,19 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Basic validation
+    // Basic validation — check required fields
     if (!body.name || !body.email || !body.phone) {
       return NextResponse.json(
         { error: 'Name, email, and phone are required.' },
+        { status: 400 }
+      );
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(body.email)) {
+      return NextResponse.json(
+        { error: 'Please provide a valid email address.' },
         { status: 400 }
       );
     }
