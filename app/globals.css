@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8FAFC; /* Off-white for main body */
+  --foreground: #111827; /* Dark text */
+  --primary: #4F46E5; /* Royal Violet/Indigo */
+  --primary-hover: #4338CA;
+  --accent: #F97316; /* Warm Orange/Coral */
+  --dark-section: #111827;
+  --dark-card: #1F2937;
+  
+  /* New vibrant palette */
+  --crimson: #901E3E;
+  --plum: #511D43;
+  --navy: #0D1164;
+  --cyan: #06B6D4;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent: var(--accent);
+  --color-dark-section: var(--dark-section);
+  --color-dark-card: var(--dark-card);
+  --color-crimson: var(--crimson);
+  --color-plum: var(--plum);
+  --color-navy: var(--navy);
+  --color-cyan: var(--cyan);
+  --font-sans: var(--font-jakarta);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #111827;
+    --foreground: #F8FAFC;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), sans-serif;
+  overflow-x: hidden;
+}
+
+/* Micro-animations and utility classes */
+@layer utilities {
+  .floating-badge {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .glass-card-dark {
+    background: rgba(13, 17, 100, 0.4); /* using Navy */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .blob {
+    position: absolute;
+    filter: blur(80px);
+    z-index: 0;
+    opacity: 0.6;
+    animation: pulseBlob 8s infinite alternate;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+
+  @keyframes pulseBlob {
+    0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+    50% { transform: scale(1.1) translate(20px, -20px); opacity: 0.7; }
+    100% { transform: scale(0.9) translate(-20px, 20px); opacity: 0.5; }
+  }
 }
